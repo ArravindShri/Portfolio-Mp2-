@@ -1,0 +1,64 @@
+Creation of Tables and Insertion of Data: 
+
+Table 1 - Time_Dimension. 
+
+Creation of Table: 
+
+USE NYC_Taxi_Analytics
+GO
+Create Table Time_dimension (
+trip_id NVARCHAR (50) PRIMARY KEY,
+pickup_datetime DATETIME,
+pickup_date DATE,
+pickup_hour TINYINT,
+day_of_week TINYINT,
+month TINYINT,
+year SMALLINT,
+is_weekend BIT,
+time_category VARCHAR(10)
+)
+
+Insertion of Data: 
+
+INSERT INTO Time_dimension (
+trip_id,
+pickup_datetime,
+pickup_date,
+pickup_hour,
+day_of_week,
+month,
+year,
+is_weekend,
+time_category
+)
+SELECT
+id,
+pickup_datetime,
+CAST(pickup_datetime AS DATE),
+DATEPART(hour, pickup_datetime),
+
+CASE DATENAME(weekday, pickup_datetime)
+WHEN 'Monday' THEN 1
+WHEN 'Tuesday' THEN 2
+WHEN 'Wednesday' THEN 3
+WHEN 'Thursday' THEN 4
+WHEN 'Friday' THEN 5
+WHEN 'Saturday' THEN 6
+WHEN 'Sunday' THEN 7
+END,
+
+MONTH(pickup_datetime),
+YEAR(pickup_datetime),
+
+CASE WHEN DATENAME(weekday, pickup_datetime) IN ('Saturday', 'Sunday') THEN 1
+ELSE 0
+END,
+
+CASE
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 5 AND 11 THEN 'Morning'
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 12 AND 16 THEN 'Afternoon'
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 17 AND 20 THEN 'Evening'
+ELSE 'Night'
+END
+
+FROM NYC_Taxi_Analytics;
