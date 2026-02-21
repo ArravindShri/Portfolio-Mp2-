@@ -1,0 +1,166 @@
+Check #1 - Total rows - 14588644
+
+ Check #2 - Bad data 
+
+USE NYC_Taxi_Analytics;
+
+GO
+
+
+
+
+SELECT
+
+    -- 1. NULL & EMPTY CHECKS (Combined from your previous optimization)
+
+    COUNT(CASE WHEN id IS NULL OR id = '' THEN 1 END) AS id_nulls,
+
+    COUNT(CASE WHEN passenger_count IS NULL THEN 1 END) AS passenger_nulls,
+
+    COUNT(CASE WHEN store_and_fwd_flag IS NULL OR store_and_fwd_flag = '' THEN 1 END) AS flag_nulls,
+
+
+
+
+    -- 2. CHECK #3: INVALID TRIP DURATION
+
+    COUNT(CASE WHEN trip_duration <= 0 THEN 1 END) AS duration_zero_or_neg,
+
+    COUNT(CASE WHEN trip_duration > 0 AND trip_duration < 60 THEN 1 END) AS duration_under_1min,
+
+    COUNT(CASE WHEN trip_duration > 86400 THEN 1 END) AS duration_over_24hr,
+
+
+
+
+    -- 3. CHECK #4: INVALID PASSENGER COUNT
+
+    COUNT(CASE WHEN passenger_count = 0 THEN 1 END) AS passenger_zero,
+
+    COUNT(CASE WHEN passenger_count > 6 THEN 1 END) AS passenger_over_6,
+
+
+
+
+    -- 4. CHECK #5: INVALID COORDINATES (GPS ERRORS & RANGE)
+
+    COUNT(CASE WHEN pickup_longitude = 0 OR pickup_latitude = 0 OR
+
+                    dropoff_longitude = 0 OR dropoff_latitude = 0 THEN 1 END) AS coords_are_zero,
+
+    COUNT(CASE WHEN (pickup_latitude NOT BETWEEN 40.5 AND 41.0) OR
+
+                    (pickup_longitude NOT BETWEEN -74.3 AND -73.7) THEN 1 END) AS coords_out_of_NYC,
+
+
+
+
+    -- 5. CHECK #6: DATE RANGE COVERAGE
+
+    MIN(pickup_datetime) AS data_starts,
+
+    MAX(pickup_datetime) AS data_ends,
+
+
+
+
+    -- TOTAL CONTEXT
+
+    COUNT(*) AS total_rows_in_table
+
+FROM NYC_Taxi_Analytics;
+
+
+
+
+-- CHECK #7: DUPLICATE IDs (Must be run as a separate count)
+
+SELECT COUNT(*) AS total_duplicate_ids
+
+FROM (
+
+    SELECT id FROM NYC_Taxi_Analytics
+
+    GROUP BY id
+
+    HAVING COUNT(*) > 1
+
+) AS sub;
+
+GO
+
+3. Deleting:
+
+USE NYC_Taxi_Analytics;
+
+GO
+
+
+
+
+BEGIN TRANSACTION;
+
+
+
+
+-- Deleting rows that meet ANY of the invalid criteria
+
+DELETE FROM NYC_Taxi_Analytics
+
+WHERE
+
+    -- Null checks
+
+    passenger_count IS NULL
+
+    
+
+    -- Trip duration issues
+
+    OR trip_duration > 86400
+
+    OR trip_duration < 60
+
+
+
+
+    -- Passenger count issues
+
+    OR passenger_count = 0
+
+    OR passenger_count > 6
+
+
+
+
+    -- Coordinate issues (Pickup)
+
+    OR pickup_latitude NOT BETWEEN 40.5 AND 41.0
+
+    OR pickup_longitude NOT BETWEEN -74.3 AND -73.7
+
+    
+
+    -- Coordinate issues (Dropoff)
+
+    OR dropoff_latitude NOT BETWEEN 40.5 AND 41.0
+
+    OR dropoff_longitude NOT BETWEEN -74.3 AND -73.7;
+
+
+
+
+-- 1. Check the number of rows affected
+
+SELECT @@ROWCOUNT AS Total_Rows_Deleted;
+
+
+
+
+-- 2. IMPORTANT: If the number looks correct (around 8,800 - 9,000), run COMMIT.
+
+-- If it says 1.4 million (the whole table), run ROLLBACK immediately!
+
+COMMIT;
+
+-- ROLLBACK;
