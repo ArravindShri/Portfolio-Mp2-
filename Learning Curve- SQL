@@ -1,0 +1,26 @@
+The SQL journey for this project involved architecting a multi-layered data warehouse to transform raw NYC taxi records into a refined "Gold" layer for visualization.
+---
+
+### **The 4-Table SQL Architecture**
+
+* **`NYC_Taxi_Analytics` (The Bronze/Base Layer)**: This table acted as the primary landing zone for raw trip data, capturing every detail of individual taxi rides, including timestamps and vendor IDs.
+* **`Zones` (The Reference Layer)**: The developer engineered this table to store geospatial metadata, calculating `avg_latitude` and `avg_longitude` to ensure precise plotting of New York neighborhoods.
+* **`Time_dimension` (The Attribute Layer)**: A specialized table designed to break down dates into "Day of Week" and "Month," enabling high-level trend analysis for commuting patterns.
+* **`Daily_summary` (The Silver/Aggregated Layer)**: This table represented the height of the SQL processing, where raw data was transformed into pre-calculated metrics like `avg_trip_duration` and `total_passengers` for dashboard efficiency.
+
+---
+
+### **SQL Engineering Milestones**
+
+* **Schema Design & Type Safety**: The developer implemented rigorous schema definitions, utilizing specific data types like `DECIMAL(10,6)` for coordinates to ensure no loss of precision during the mapping process.
+* **Complex Aggregation**: SQL logic was used to bridge the gap between individual trip records and executive-level KPIs, such as calculating the **Weekend %** and **Peak Hours** across millions of rows.
+* **Data Integrity & Cleansing**: The journey involved identifying and correcting "dirty" data, ensuring that only valid trips with non-zero durations and proper zone IDs migrated from the Bronze to the Silver layer.
+* **Join Optimization**: The developer successfully implemented relational joins between the `Trip_metrics` and `Zones` tables, allowing the final Power BI dashboard to dynamically filter data by neighborhood name.
+
+---
+
+### **Technical Skills Demonstrated on GitHub**
+
+* **DDL/DML Proficiency**: Writing robust scripts for table creation, data loading, and iterative troubleshooting.
+* **Data Warehousing Strategy**: Implementing a clear "Bronze-to-Silver" architecture that mimics real-world enterprise data pipelines.
+* **Geospatial Logic**: Transforming raw numerical data into actionable geographical insights.
