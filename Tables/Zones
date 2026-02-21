@@ -1,0 +1,52 @@
+Table - #4
+
+Creation of table: Create TABLE Zones ( 
+zone_id INT IDENTITY(1,1) PRIMARY KEY,
+Zone_Name VARCHAR(50),
+avg_latitude DECIMAL(10,6),
+avg_longitude DECIMAL (10,6),
+trip_count INT 
+)
+
+Insertion of Data
+
+WITH CategorizedZones AS (
+    SELECT 
+        pickup_latitude,
+        pickup_longitude,
+        CASE 
+            -- MANHATTAN
+            WHEN (pickup_latitude BETWEEN 40.75 AND 40.77) AND (pickup_longitude BETWEEN -73.99 AND -73.97) THEN 'Midtown Manhattan'
+            WHEN (pickup_latitude BETWEEN 40.70 AND 40.73) AND (pickup_longitude BETWEEN -74.02 AND -73.99) THEN 'Lower Manhattan'
+            WHEN (pickup_latitude BETWEEN 40.77 AND 40.82) AND (pickup_longitude BETWEEN -73.96 AND -73.93) THEN 'Upper Manhattan'
+            WHEN (pickup_latitude BETWEEN 40.77 AND 40.80) AND (pickup_longitude BETWEEN -74.00 AND -73.96) THEN 'Upper West Side'
+            
+            -- BROOKLYN
+            WHEN (pickup_latitude BETWEEN 40.69 AND 40.72) AND (pickup_longitude BETWEEN -73.96 AND -73.93) THEN 'Brooklyn - North'
+            WHEN (pickup_latitude BETWEEN 40.64 AND 40.69) AND (pickup_longitude BETWEEN -73.99 AND -73.94) THEN 'Brooklyn - South'
+            
+            -- QUEENS
+            WHEN (pickup_latitude BETWEEN 40.74 AND 40.77) AND (pickup_longitude BETWEEN -73.93 AND -73.88) THEN 'Queens - West'
+            WHEN (pickup_latitude BETWEEN 40.72 AND 40.76) AND (pickup_longitude BETWEEN -73.88 AND -73.75) THEN 'Queens - East'
+            WHEN (pickup_latitude BETWEEN 40.63 AND 40.66) AND (pickup_longitude BETWEEN -73.82 AND -73.77) THEN 'JFK Airport Area'
+            WHEN (pickup_latitude BETWEEN 40.77 AND 40.78) AND (pickup_longitude BETWEEN -73.88 AND -73.86) THEN 'LaGuardia Airport'
+            
+            -- BRONX
+            WHEN (pickup_latitude BETWEEN 40.82 AND 40.90) AND (pickup_longitude BETWEEN -73.93 AND -73.85) THEN 'Bronx'
+            
+            ELSE 'Other NYC Areas'
+        END AS temp_zone_name
+    FROM Trip_metrics
+),
+ZoneStats AS (
+    SELECT 
+        temp_zone_name AS Zone_Name,
+        AVG(pickup_latitude) AS avg_latitude,
+        AVG(pickup_longitude) AS avg_longitude,
+        COUNT(*) AS trip_count
+    FROM CategorizedZones
+    GROUP BY temp_zone_name
+)
+INSERT INTO Zones (Zone_Name, avg_latitude, avg_longitude, trip_count)
+SELECT Zone_Name, avg_latitude, avg_longitude, trip_count
+FROM ZoneStats;
