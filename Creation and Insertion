@@ -1,0 +1,68 @@
+Creation, Insertion:
+
+USE master;
+Go
+CREATE DATABASE NYC_Taxi_Analytics
+Go
+USE NYC_Taxi_Analytics;
+GO
+-- 1. Drop existing table to fix the column structure
+
+IF OBJECT_ID('NYC_Taxi_Analytics','U') IS NOT NULL
+
+    DROP TABLE NYC_Taxi_Analytics;
+
+GO
+-- 2. Create table with the EXACT order found in the train.csv
+
+CREATE TABLE NYC_Taxi_Analytics (
+
+    id NVARCHAR(50),            
+
+    vendor_id INT,
+
+    pickup_datetime DATETIME,
+
+    dropoff_datetime DATETIME,
+
+    passenger_count INT,
+
+    pickup_longitude FLOAT,
+
+    pickup_latitude FLOAT,       -- Matches column 7 in CSV
+
+    dropoff_longitude FLOAT,     -- Matches column 8 in CSV
+
+    dropoff_latitude FLOAT,      -- MISSING in your previous script; added to match CSV
+
+    store_and_fwd_flag NVARCHAR(5),
+
+    trip_duration INT
+
+);
+
+GO
+-- 3. Execute the Bulk Insert
+
+BULK INSERT NYC_Taxi_Analytics
+
+FROM 'C:\Mac\Home\Desktop\Data Analysis\ Mock Projects\MP-1\nyc-taxi-trip-duration\train.csv'
+
+WITH (
+
+    FIRSTROW = 2,           
+
+    FIELDTERMINATOR = ',', 
+
+    ROWTERMINATOR = '0x0a', -- Standard for CSVs generated on Mac/Unix environments
+
+    TABLOCK
+
+);
+
+GO
+
+Issues Faced -
+
+Did not write the query with the same order of the CSV file. Have to delete DB twice one for the previous reported issue and a spelling mistake. 
+
