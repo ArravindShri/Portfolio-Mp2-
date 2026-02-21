@@ -1,0 +1,56 @@
+Table -# 3
+
+CREATE TABLE Daily_summary(
+	summary_date DATE PRIMARY KEY,
+	total_trips INT,
+	total_passengers INT,
+	avg_trip_duration_minutes DECIMAL(10,2),
+	max_trip_duration_minutes DECIMAL(10,2),
+	min_trip_duration_minutes DECIMAL(10,2),
+	peak_hour INT
+) 
+;   Insertion of Data 
+
+WITH DailyStats AS (
+    SELECT 
+        CAST(pickup_datetime as DATE ) as summary_date,
+        COUNT(id) as total_trips,
+        SUM(passenger_count) as total_passengers,
+        AVG(trip_duration_minutes) as avg_trip_duration_minutes,
+        MAX(trip_duration_minutes) as max_trip_duration_minutes,
+        MIN(trip_duration_minutes) as min_trip_duration_minutes
+    FROM Trip_metrics
+    GROUP BY CAST(pickup_datetime as DATE )
+),
+HourlyCounts AS (
+    SELECT 
+        CAST(pickup_datetime AS DATE) as summary_date,
+        DATEPART(hour, pickup_datetime) as trip_hour,
+        ROW_NUMBER() OVER(
+            PARTITION BY CAST(pickup_datetime AS DATE) 
+            ORDER BY COUNT(id) DESC
+        ) as hr_rank
+    FROM Trip_metrics
+    GROUP BY CAST(pickup_datetime AS DATE), DATEPART(hour, pickup_datetime)
+)
+-- Now we tell SQL where to put the data
+INSERT INTO Daily_summary (
+    summary_date, 
+    total_trips, 
+    total_passengers, 
+    avg_trip_duration_minutes, 
+    max_trip_duration_minutes, 
+    min_trip_duration_minutes, 
+    peak_hour
+)
+SELECT 
+    d.summary_date,
+    d.total_trips,
+    d.total_passengers,
+    d.avg_trip_duration_minutes,
+    d.max_trip_duration_minutes,
+    d.min_trip_duration_minutes,
+    h.trip_hour as peak_hour
+FROM DailyStats d
+JOIN HourlyCounts h ON d.summary_date = h.summary_date
+WHERE h.hr_rank = 1;
