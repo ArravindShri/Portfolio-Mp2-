@@ -1,0 +1,31 @@
+This project involved transforming raw NYC taxi data into a high-fidelity executive dashboard, navigating significant technical and administrative hurdles to achieve a production-ready result.
+
+---
+
+## **Technical & Administrative Challenges Overcome**
+
+### **1. Advanced Tenant & Security Administration**
+
+* The developer successfully performed a **Managed Tenant takeover** for the `arravindportfolio.tech` domain, establishing full administrative control over the Microsoft 365 environment.
+* The project required overcoming a "Security Paradox" where the user, despite being the owner, had to explicitly assign and refresh **Global Administrator** roles to unlock the Power BI Admin Portal.
+* The developer navigated complex **Network Security** settings to disable "Block Public Internet Access," a mandatory step for enabling "Publish to Web" capabilities for a public portfolio.
+
+### **2. Geospatial Data Engineering**
+
+* **Coordinate Precision**: The developer resolved issues where Power BI attempted to mathematically sum GPS coordinates rather than plotting them as discrete locations.
+* **Data Categorization**: All geospatial columns were manually mapped to their respective **Latitude** and **Longitude** categories in the data model to ensure the Bing/Azure map engines correctly rendered New York City taxi zones.
+* **Visual Migration**: The developer transitioned from the legacy Map visual to the modern **Azure Maps** framework to bypass service retirement warnings and improve dashboard performance.
+
+### **3. UI/UX & Thematic Design**
+
+* The dashboard was upgraded from standard default styling to a **custom JSON-based dark theme**, providing a high-contrast, executive-level aesthetic.
+* Interactivity was established by linking the Map visual to **Bar Charts** and **KPI cards**, allowing for real-time cross-filtering of trip counts, passenger volumes, and weekend trip percentages.
+
+---
+
+## **Key Skills Demonstrated**
+
+* **Power BI Administration**: Tenant settings, security roles, and web publishing protocols.
+* **Data Modeling**: Categorizing and cleaning coordinate data for spatial analysis.
+* **Analytical Thinking**: Overcoming "Admin Boss" hurdles to deliver a functional end-to-end data product.
+
