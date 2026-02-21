@@ -1,0 +1,121 @@
+Table = #2 
+
+CReation of the trip_metrics table
+
+CREATE TABLE Trip_metrics (
+
+ 
+
+    id NVARCHAR(50) PRIMARY KEY,            
+
+
+
+
+    vendor_id INT,
+
+
+
+
+    pickup_datetime DATETIME,
+
+
+
+
+    dropoff_datetime DATETIME,
+
+
+
+
+    passenger_count INT,
+
+
+
+
+    pickup_longitude FLOAT,
+
+
+
+
+    pickup_latitude FLOAT,       -- Matches column 7 in CSV
+
+
+
+
+    dropoff_longitude FLOAT,     -- Matches column 8 in CSV
+
+
+
+
+    dropoff_latitude FLOAT,      -- MISSING in your previous script; added to match CSV
+
+
+
+
+    store_and_fwd_flag NVARCHAR(5),
+
+
+
+
+    trip_duration INT,
+
+
+
+
+    trip_duration_minutes DECIMAL(10,20),
+
+
+
+
+    day_type VARCHAR(10),
+
+
+
+
+    time_of_day VARCHAR(10)
+
+
+
+
+    )
+
+2. Inserting data:
+
+INSERT INTO Trip_metrics (
+    id, 
+    vendor_id, 
+    pickup_datetime, 
+    dropoff_datetime, 
+    passenger_count, 
+    pickup_longitude, 
+    pickup_latitude, 
+    dropoff_longitude, 
+    dropoff_latitude, 
+    store_and_fwd_flag, 
+    trip_duration, 
+    trip_duration_minutes, 
+    day_type, 
+    time_of_day
+)
+
+SELECT 
+    id, 
+    vendor_id, 
+    pickup_datetime, 
+    dropoff_datetime, 
+    passenger_count, 
+    pickup_longitude, 
+    pickup_latitude, 
+    dropoff_longitude, 
+    dropoff_latitude, 
+    store_and_fwd_flag, 
+    trip_duration,
+    trip_duration/60.0,
+    CASE WHEN DATENAME(weekday,pickup_datetime) IN ('Saturday','Sunday') THEN 'Weekend' ELSE 'Weekday' END,
+    CASE
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 5 AND 11 THEN 'Morning'
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 12 AND 16 THEN 'Afternoon'
+WHEN DATEPART(hour, pickup_datetime) BETWEEN 17 AND 20 THEN 'Evening'
+ELSE 'Night'
+END
+FROM NYC_Taxi_Analytics
+  
