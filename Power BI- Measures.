@@ -1,0 +1,57 @@
+**POWER BI DAX MEASURES - SUMMARY**
+---
+
+## **MEASURES CREATED (6 TOTAL):**
+
+### **1. Total Trips**
+```dax
+Total Trips = COUNT(NYC_Taxi_Analytics[id])
+```
+**Purpose:** Count total number of taxi trips
+
+---
+
+### **2. Avg Trip Duration (min)**
+```dax
+Avg Trip Duration (min) = AVERAGE(Trip_metrics[trip_duration_minutes])
+```
+**Purpose:** Calculate average trip duration in minutes
+
+---
+
+### **3. Total Passengers**
+```dax
+Total Passengers = SUM(NYC_Taxi_Analytics[passenger_count])
+```
+**Purpose:** Sum all passengers across all trips
+
+---
+
+### **4. Weekend Trips**
+```dax
+Weekend Trips = CALCULATE(COUNT(NYC_Taxi_Analytics[id]), Trip_metrics[day_type] = "Weekend")
+```
+**Purpose:** Count only trips that happened on weekends
+**Advanced:** Uses CALCULATE function with filter context
+
+---
+
+### **5. Weekend %**
+```dax
+Weekend % = DIVIDE([Weekend Trips], [Total Trips], 0) * 100
+```
+**Purpose:** Calculate percentage of trips on weekends
+**Advanced:** Uses other measures in calculation, DIVIDE prevents errors
+
+---
+
+### **6. Max Trip Duration (hrs)**
+```dax
+Max Trip Duration (hrs) = MAX(Trip_metrics[trip_duration_minutes]) / 60
+```
+**Purpose:** Find longest trip duration, converted to hours
+
+---
+
+
+**This summary is perfect for your GitHub README or interview prep!** 💪
